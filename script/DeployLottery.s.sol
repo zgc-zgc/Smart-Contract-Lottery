@@ -1,0 +1,53 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.18;
+
+import {Raffle} from "../src/Raffle.sol";
+import {Script} from "forge-std/Script.sol";
+import {HelperConfig} from "./HelperConfig.s.sol";
+import {CreateSubscription, FundSubscription, AddConsumer} from "./Interactions.s.sol";
+import {console2} from "forge-std/console2.sol";
+
+contract DeployLottery is Script {
+    Raffle public raffle;
+    HelperConfig public helperConfig;
+
+    address vrfCoordinator;
+    uint256 subscriptionId;
+    uint256 entranceFee;
+    uint256 interval;
+    bytes32 gasLane;
+    uint32 callbackGasLimit;
+    address linkToken;
+
+    function run() external returns (Raffle, HelperConfig.NetworkConfig memory) {
+        helperConfig = new HelperConfig();
+        HelperConfig.NetworkConfig memory networkConfig = helperConfig.getActiveNetworkConfig();
+
+        //subscription
+        if (subscriptionId == 0) {
+            CreateSubscription createSubscription = new CreateSubscription();
+            subscriptionId = createSubscription.createSubscriptionUsingConfig(networkConfig);
+            //Update subscriptionId in networkConfig
+            networkConfig.subscriptionId = subscriptionId;
+        }
+        //Fund My Subscription
+        FundSubscription fundSubscription = new FundSubscription();
+        fundSubscription.FundSubscriptionUsingConfig(networkConfig);
+
+        vm.startBroadcast();
+        raffle = new Raffle(
+            networkConfig.entranceFee,
+            networkConfig.interval,
+            networkConfig.vrfCoordinator,
+            networkConfig.gasLane,
+            networkConfig.subscriptionId,
+            networkConfig.callbackGasLimit
+        );
+        vm.stopBroadcast();
+
+        // Add Consumer  有时间把这个先移出去，放到interactions里面，放这里他获取不到，可能是stopBroadcast的问题，没有及时把./broadcast放出来
+        AddConsumer addConsumer = new AddConsumer();
+        addConsumer.addConsumerUsingConfig(address(raffle), networkConfig);
+        return (raffle, networkConfig);
+    }
+}

@@ -1,0 +1,40 @@
+Compiling 46 files with Solc 0.8.19
+Solc 0.8.19 finished in 3.31s
+Compiler run successful!
+Analysing contracts...
+Running tests...
+
+Ran 12 tests for test/LotteryTest.t.sol:LotteryTest
+[PASS] testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep() (gas: 393853)
+[PASS] test_checkUpkeep_ReturnsFalse_WhenNoBalance() (gas: 20379)
+[PASS] test_checkUpkeep_ReturnsFalse_WhenNotEnoughTimePassed() (gas: 388565)
+[PASS] test_checkUpkeep_ReturnsTrue_WhenParametersGood() (gas: 391527)
+[PASS] test_enterRaffle_EmitsEvent_WhenPlayerEnters() (gas: 74043)
+[PASS] test_enterRaffle_Reverts_WhenNotEnoughFee() (gas: 15007)
+[PASS] test_enterRaffle_Reverts_WhenRaffleCalculating() (gas: 544786)
+[PASS] test_enterRaffle_Success_WhenEnoughFee() (gas: 385123)
+[PASS] test_fulfillRandomWords_EmitsEvent_WhenWinnerPicked() (gas: 521866)
+[PASS] test_fulfillRandomWords_PicksWinner_WhenCalled() (gas: 514760)
+[PASS] test_fulfillRandomWords_Reverts_WhenTransferFails() (gas: 277336)
+[PASS] test_performUpkeep_Reverts_WhenCheckUpkeepFalse() (gas: 21998)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 14.61ms (22.84ms CPU time)
+
+Ran 1 test suite in 142.50ms (14.61ms CPU time): 12 tests passed, 0 failed, 0 skipped (12 total tests)
+
+╭----------------------------+------------------+-----------------+---------------+----------------╮
+| File                       | % Lines          | % Statements    | % Branches    | % Funcs        |
++==================================================================================================+
+| script/DeployLottery.s.sol | 100.00% (15/15)  | 100.00% (18/18) | 100.00% (1/1) | 100.00% (1/1)  |
+|----------------------------+------------------+-----------------+---------------+----------------|
+| script/HelperConfig.s.sol  | 73.68% (14/19)   | 75.00% (12/16)  | 33.33% (1/3)  | 75.00% (3/4)   |
+|----------------------------+------------------+-----------------+---------------+----------------|
+| script/Interactions.s.sol  | 79.31% (23/29)   | 86.96% (20/23)  | 50.00% (1/2)  | 50.00% (3/6)   |
+|----------------------------+------------------+-----------------+---------------+----------------|
+| src/Raffle.sol             | 88.46% (46/52)   | 93.88% (46/49)  | 100.00% (4/4) | 72.73% (8/11)  |
+|----------------------------+------------------+-----------------+---------------+----------------|
+| test/LotteryTest.t.sol     | 100.00% (2/2)    | 100.00% (1/1)   | 100.00% (0/0) | 100.00% (1/1)  |
+|----------------------------+------------------+-----------------+---------------+----------------|
+| test/mocks/LinkToken.sol   | 23.53% (4/17)    | 15.38% (2/13)   | 0.00% (0/1)   | 40.00% (2/5)   |
+|----------------------------+------------------+-----------------+---------------+----------------|
+| Total                      | 77.61% (104/134) | 82.50% (99/120) | 63.64% (7/11) | 64.29% (18/28) |
+╰----------------------------+------------------+-----------------+---------------+----------------╯
