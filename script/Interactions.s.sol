@@ -21,7 +21,7 @@ contract CreateSubscription is Script {
     {
         HelperConfig.NetworkConfig memory networkConfig = _networkConfig;
         address vrfCoordinator = networkConfig.vrfCoordinator;
-        vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
+        vm.startBroadcast(networkConfig.account);
         subscriptionId = VRFCoordinatorV2_5Mock(vrfCoordinator).createSubscription();
         vm.stopBroadcast();
     }
@@ -30,10 +30,12 @@ contract CreateSubscription is Script {
 }
 
 /**
- * @dev The FUND_ETHER should not be too small
+ * @dev The FUND_ETHER should not be too small or too large,In the Sepolia testnet environment,
+ *  we simulate the LINK balance of address 0x51eD19819B5a960B4B3aDfeDEedCeCaB51953010.
+ *  The FundSubscription operation will fail when this address has insufficient balance.
  */
 contract FundSubscription is Script {
-    uint256 private constant FUND_ETHER = 500 ether;
+    uint256 private constant FUND_ETHER = 200 ether;
     uint256 private constant STARTING_USER_BALANCE = 1000 ether;
     uint256 private constant LOCAL_CHAIN_ID = 31337;
 
@@ -43,13 +45,15 @@ contract FundSubscription is Script {
         uint256 subscriptionId = networkConfig.subscriptionId;
         address linkToken = networkConfig.linkToken;
         if (block.chainid == LOCAL_CHAIN_ID) {
-            vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
+            vm.startBroadcast(networkConfig.account);
             LinkToken(linkToken).mint(address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266), STARTING_USER_BALANCE);
             VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subscriptionId, FUND_ETHER);
             vm.stopBroadcast();
         } else {
-            vm.startBroadcast();
+            vm.startBroadcast(networkConfig.account);
+            require(LinkToken(linkToken).balanceOf(networkConfig.account) >= FUND_ETHER, "He didn't have enough LINKs!");
             LinkToken(linkToken).transferAndCall(vrfCoordinator, FUND_ETHER, abi.encode(subscriptionId));
+            // VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subscriptionId, FUND_ETHER);
             vm.stopBroadcast();
         }
     }
@@ -64,7 +68,7 @@ contract AddConsumer is Script {
         HelperConfig.NetworkConfig memory networkConfig = _networkConfig;
         address vrfCoordinator = networkConfig.vrfCoordinator;
         uint256 subscriptionId = networkConfig.subscriptionId;
-        vm.startBroadcast();
+        vm.startBroadcast(networkConfig.account);
         VRFCoordinatorV2_5Mock(vrfCoordinator).addConsumer(subscriptionId, mostRecentlyDeployed);
         vm.stopBroadcast();
     }

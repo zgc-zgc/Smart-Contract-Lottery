@@ -26,6 +26,7 @@ contract HelperConfig is Script, HelperConfigConstants {
         uint256 subscriptionId;
         uint32 callbackGasLimit;
         address linkToken;
+        address account;
     }
 
     constructor() {
@@ -48,7 +49,8 @@ contract HelperConfig is Script, HelperConfigConstants {
             gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
             subscriptionId: 0,
             callbackGasLimit: 500000,
-            linkToken: 0x779877a7C1d9E45982C52437F0dAf5F4A4891510
+            linkToken: 0x779877A7B0D9E8603169DdbD7836e478b4624789,
+            account: 0x51eD19819B5a960B4B3aDfeDEedCeCaB51953010 //A known address with test tokens
         });
         return sepoliaConfig;
     }
@@ -69,7 +71,8 @@ contract HelperConfig is Script, HelperConfigConstants {
             gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
             subscriptionId: 0,
             callbackGasLimit: 500000,
-            linkToken: address(linkToken)
+            linkToken: address(linkToken),
+            account: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
         });
         return anvilConfig;
     }

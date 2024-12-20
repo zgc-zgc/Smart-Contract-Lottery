@@ -34,7 +34,7 @@ contract DeployLottery is Script {
         FundSubscription fundSubscription = new FundSubscription();
         fundSubscription.FundSubscriptionUsingConfig(networkConfig);
 
-        vm.startBroadcast();
+        vm.startBroadcast(networkConfig.account);
         raffle = new Raffle(
             networkConfig.entranceFee,
             networkConfig.interval,
@@ -45,7 +45,7 @@ contract DeployLottery is Script {
         );
         vm.stopBroadcast();
 
-        // Add Consumer  有时间把这个先移出去，放到interactions里面，放这里他获取不到，可能是stopBroadcast的问题，没有及时把./broadcast放出来
+        // Add Consumer
         AddConsumer addConsumer = new AddConsumer();
         addConsumer.addConsumerUsingConfig(address(raffle), networkConfig);
         return (raffle, networkConfig);

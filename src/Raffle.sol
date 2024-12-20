@@ -159,6 +159,10 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         return s_lastTimeStamp;
     }
 
+    function getRaffleState() public view returns (RaffleState) {
+        return s_raffleState;
+    }
+
     /* Receive & Fallback */
     receive() external payable {
         enterRaffle();

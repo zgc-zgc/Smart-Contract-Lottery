@@ -60,6 +60,13 @@ contract LotteryTest is Test {
         _;
     }
 
+    modifier skipFork() {
+        if (block.chainid != 31337) {
+            return;
+        }
+        _;
+    }
+
     /////////////////////////////////////////////
     ////////   RAFFLE ENTRANCE TESTS    ////////
     /////////////////////////////////////////////
@@ -136,7 +143,13 @@ contract LotteryTest is Test {
     /////////////////////////////////////////////
     ///////   FULFILLRANDOMWORDS TESTS   ///////
     /////////////////////////////////////////////
-    function test_fulfillRandomWords_PicksWinner_WhenCalled() public tenEnteredRaffle {
+    /**
+     * @dev On the testnet, tests that simulate Chainlink nodes sending random numbers
+     *  (using VRFCoordinatorV2_5Mock(networkConfig.vrfCoordinator).fulfillRandomWords) cannot pass.
+     *  If you want to test Raffle's behavior when receiving random numbers,
+     *  you can use raffle.rawFulfillRandomWords instead.
+     */
+    function test_fulfillRandomWords_PicksWinner_WhenCalled() public tenEnteredRaffle skipFork {
         vm.warp(block.timestamp + networkConfig.interval + 1);
         vm.roll(block.number + 1);
         vm.recordLogs();
@@ -154,10 +167,16 @@ contract LotteryTest is Test {
 
         VRFCoordinatorV2_5Mock(networkConfig.vrfCoordinator).fulfillRandomWords(requestId, address(raffle));
 
+        assert(raffle.getRaffleState() == Raffle.RaffleState.OPEN);
         assert(raffle.getRecentWinner() != address(0));
     }
 
-    function test_fulfillRandomWords_EmitsEvent_WhenWinnerPicked() public tenEnteredRaffle RandomNumRequested {
+    function test_fulfillRandomWords_EmitsEvent_WhenWinnerPicked()
+        public
+        tenEnteredRaffle
+        RandomNumRequested
+        skipFork
+    {
         vm.recordLogs();
         VRFCoordinatorV2_5Mock(networkConfig.vrfCoordinator).fulfillRandomWords(requestId, address(raffle));
         Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -200,7 +219,7 @@ contract LotteryTest is Test {
         raffle.rawFulfillRandomWords(requestId, new uint256[](1));
     }
 
-    function test_FulfillRandomWords_Revret_WithoutPerformUpkeepCalled() public tenEnteredRaffle {
+    function test_FulfillRandomWords_Revret_WithoutPerformUpkeepCalled() public tenEnteredRaffle skipFork {
         vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
         VRFCoordinatorV2_5Mock(networkConfig.vrfCoordinator).fulfillRandomWords(0, address(raffle));
     }

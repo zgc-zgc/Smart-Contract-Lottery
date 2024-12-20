@@ -12,4 +12,6 @@ remappings = [
     "@solmate/=lib/solmate/src/",
     "@forge-std/=lib/forge-std/src/",
 ]
+[fuzz]
+runs = 2
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
