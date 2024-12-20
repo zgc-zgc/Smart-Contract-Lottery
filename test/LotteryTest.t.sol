@@ -42,7 +42,7 @@ contract LotteryTest is Test {
         _;
     }
 
-    modifier AfterRandomNumRequested() {
+    modifier RandomNumRequested() {
         vm.warp(block.timestamp + networkConfig.interval + 1);
         vm.roll(block.number + 1);
         vm.recordLogs();
@@ -157,7 +157,7 @@ contract LotteryTest is Test {
         assert(raffle.getRecentWinner() != address(0));
     }
 
-    function test_fulfillRandomWords_EmitsEvent_WhenWinnerPicked() public tenEnteredRaffle AfterRandomNumRequested {
+    function test_fulfillRandomWords_EmitsEvent_WhenWinnerPicked() public tenEnteredRaffle RandomNumRequested {
         vm.recordLogs();
         VRFCoordinatorV2_5Mock(networkConfig.vrfCoordinator).fulfillRandomWords(requestId, address(raffle));
         Vm.Log[] memory entries = vm.getRecordedLogs();
@@ -200,9 +200,17 @@ contract LotteryTest is Test {
         raffle.rawFulfillRandomWords(requestId, new uint256[](1));
     }
 
-    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep() public tenEnteredRaffle {
+    function test_FulfillRandomWords_Revret_WithoutPerformUpkeepCalled() public tenEnteredRaffle {
         vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
         VRFCoordinatorV2_5Mock(networkConfig.vrfCoordinator).fulfillRandomWords(0, address(raffle));
+    }
+
+    function test_fuzz_fulfillRandomWords_PicksWinner_WhenCalled(uint256 _requestedNumber) public tenEnteredRaffle {
+        uint256[] memory requestedNumbers = new uint256[](1);
+        requestedNumbers[0] = _requestedNumber;
+        vm.prank(address(networkConfig.vrfCoordinator));
+        raffle.rawFulfillRandomWords(0, requestedNumbers);
+        assert(raffle.getRecentWinner() != address(0));
     }
 }
 
